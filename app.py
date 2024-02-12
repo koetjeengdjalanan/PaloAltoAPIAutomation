@@ -1,6 +1,8 @@
+from pandas import DataFrame
 from ttkbootstrap.constants import *  # noqa: F403
 import ttkbootstrap as ttkb
 from lib.filehandler import FileHandler
+from pandastable import Table, TableModel
 
 
 class App(ttkb.Window):
@@ -25,6 +27,52 @@ class App(ttkb.Window):
 
         self.mainloop()
 
+    def pick_source_file(self) -> None:
+        FH = FileHandler()
+        file = FH.select_file()
+        self.dataPreview = FH.sourcedata
+        self.dataPreviewCount = len(self.dataPreview.index)
+        self.show_data_preview()
+        if file != "":
+            self.filePickerEntry.delete(0, ttkb.END)
+            self.filePickerEntry.insert(0, file)
+
+    def show_data_preview(self) -> None:
+        print(self.dataPreview.head())
+        self.previewTable = ttkb.Treeview(
+            master=self.dataFrame,
+            columns=list(self.dataPreview.columns.values),
+            show="headings",
+            style="info.treeview",
+        )
+        for heading in list(self.dataPreview.columns):
+            self.previewTable.heading(column=heading, text=heading)
+        # self.previewTable.column("#0", width=-1, minwidth=0, stretch=ttkb.NO)
+        # for col in list(self.dataPreview.columns.values):
+        #     self.previewTable.column(column=col, width=-1, minwidth=50)
+        self.previewTableYScroll = ttkb.Scrollbar(
+            master=self.dataFrame, orient="vertical", command=self.previewTable.yview
+        )
+        self.previewTableXScroll = ttkb.Scrollbar(
+            master=self.dataFrame, orient="horizontal", command=self.previewTable.xview
+        )
+        self.previewTable.configure(
+            xscrollcommand=self.previewTableXScroll.set,
+            yscrollcommand=self.previewTableYScroll.set,
+        )
+        self.previewTable.grid(row=0, column=0, sticky="nsew")
+        self.previewTableYScroll.grid(row=0, column=1, sticky="ns")
+        self.previewTableXScroll.grid(row=1, column=0, sticky="ew")
+        self.dataFrame.grid_columnconfigure(index=0, weight=1)
+        self.dataFrame.grid_rowconfigure(index=0, weight=1)
+        for count in range(self.dataPreviewCount):
+            value = self.dataPreview.loc[count, :].values.flatten().tolist()
+            self.previewTable.insert(
+                parent="",
+                index=ttkb.END,
+                values=value,
+            )
+
     def create_xsmall_layout(self):
         self.frame.pack_forget()
         self.frame = ttkb.Frame(self, bootstyle="default")
@@ -48,13 +96,6 @@ class App(ttkb.Window):
         self.frame = ttkb.Frame(self, bootstyle="default")
         self.frame.pack(expand=True, fill="both")
 
-        def pick_source_file():
-            FH = FileHandler()
-            file = FH.select_file()
-            if file != "":
-                self.filePickerEntry.delete(0, ttkb.END)
-                self.filePickerEntry.insert(0, file)
-
         self.filePickerFrame = ttkb.LabelFrame(self.frame, text="Source File")
         self.filePickerFrame.pack(fill="x", anchor="n", padx=10, pady=10)
         self.filePickerEntry = ttkb.Entry(
@@ -64,7 +105,7 @@ class App(ttkb.Window):
         ttkb.Button(
             self.filePickerFrame,
             text="Choose File",
-            command=pick_source_file,
+            command=self.pick_source_file,
         ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
 
         self.dataInfoFrame = ttkb.Frame(

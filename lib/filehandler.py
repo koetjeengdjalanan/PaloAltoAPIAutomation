@@ -8,8 +8,9 @@ from tkinter.messagebox import askokcancel, showerror
 
 class FileHandler:
     def __init__(self) -> None:
-        self.sourcefile = None
-        self.encodingList = [
+        self.sourcefile: str = None
+        self.sourcedata: pd.DataFrame = None
+        self.encodingList: list = [
             "ascii",
             "big5",
             "big5hkscs",
@@ -120,19 +121,22 @@ class FileHandler:
             title="Open Source File", initialdir="/", filetypes=filetype
         )
 
-        if self.handling_file() or self.sourcefile != "":
+        handlefile = self.handling_file()
+
+        if not handlefile.empty or self.sourcefile != "":
             return self.sourcefile
         else:
             return ""
 
-    def handling_file(self) -> dict:
+    def handling_file(self) -> pd.DataFrame:
         match pathlib.Path(self.sourcefile).suffix:
             case ".csv":
                 if askokcancel(
                     title="Confirm Source File?",
                     message="Make sure you choose CSV file separated by ',' or ';'!",
                 ):
-                    return pd.read_csv(self.sourcefile).to_dict()
+                    self.sourcedata = pd.read_csv(self.sourcefile)
+                    return self.sourcedata
                 else:
                     return {}
             case ".xlsx" | ".xls" | ".xlsm" | ".xlsb":
@@ -140,8 +144,9 @@ class FileHandler:
                     title="Confirm Source File?",
                     message="Make sure you choose Correct Excel Files",
                 ):
-                    print(pd.read_excel(self.sourcefile))
-                    return pd.read_excel(self.sourcefile).to_dict()
+                    print(type(pd.read_excel(self.sourcefile)))
+                    self.sourcedata = pd.read_excel(self.sourcefile)
+                    return self.sourcedata
                 else:
                     return {}
             case _:
