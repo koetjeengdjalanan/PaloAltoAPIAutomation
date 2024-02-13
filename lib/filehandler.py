@@ -144,7 +144,11 @@ class FileHandler:
                     title="Confirm Source File?",
                     message="Make sure you choose Correct Excel Files",
                 ):
-                    print(type(pd.read_excel(self.sourcefile)))
+                    # print(
+                    #     pd.read_excel(self.sourcefile).apply(
+                    #         lambda x: x.pd.value_counts().get("-", 0), axis=1
+                    #     )
+                    # )
                     self.sourcedata = pd.read_excel(self.sourcefile)
                     return self.sourcedata
                 else:

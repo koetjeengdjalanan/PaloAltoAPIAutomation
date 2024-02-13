@@ -13,6 +13,7 @@ class App(ttkb.Window):
 
         self.frame = ttkb.Frame(self, bootstyle="default")
         self.frame.pack(expand=True, fill="both")
+        self.dataPreviewDetails = {}
 
         SizeNotifier(
             self,
@@ -31,14 +32,26 @@ class App(ttkb.Window):
         FH = FileHandler()
         file = FH.select_file()
         self.dataPreview = FH.sourcedata
-        self.dataPreviewCount = len(self.dataPreview.index)
+        self.dataPreviewDetails = {
+            "Data Count": len(self.dataPreview),
+            # "nullValue": self.dataPreview.isnull().any(axis=1).sum(),
+            "nullValue": self.dataPreview[
+                self.dataPreview.isin(["-", None]).any(axis=1)
+            ].shape[0],
+        }
         self.show_data_preview()
+        self.show_data_preview_details()
         if file != "":
             self.filePickerEntry.delete(0, ttkb.END)
             self.filePickerEntry.insert(0, file)
 
     def show_data_preview(self) -> None:
-        print(self.dataPreview.head())
+        # print(
+        #     self.dataPreview[self.dataPreview.isin(["-", None]).any(axis=1)].shape[0],
+        #     self.dataPreview.isnull().any(axis=1).sum(),
+        #     self.dataPreview[self.dataPreview.isin(["-"]).any(axis=1)].shape[0]
+        #     + self.dataPreview.isnull().any(axis=1).sum(),
+        # )
         self.previewTable = ttkb.Treeview(
             master=self.dataFrame,
             columns=list(self.dataPreview.columns.values),
@@ -47,9 +60,6 @@ class App(ttkb.Window):
         )
         for heading in list(self.dataPreview.columns):
             self.previewTable.heading(column=heading, text=heading)
-        # self.previewTable.column("#0", width=-1, minwidth=0, stretch=ttkb.NO)
-        # for col in list(self.dataPreview.columns.values):
-        #     self.previewTable.column(column=col, width=-1, minwidth=50)
         self.previewTableYScroll = ttkb.Scrollbar(
             master=self.dataFrame, orient="vertical", command=self.previewTable.yview
         )
@@ -65,13 +75,40 @@ class App(ttkb.Window):
         self.previewTableXScroll.grid(row=1, column=0, sticky="ew")
         self.dataFrame.grid_columnconfigure(index=0, weight=1)
         self.dataFrame.grid_rowconfigure(index=0, weight=1)
-        for count in range(self.dataPreviewCount):
-            value = self.dataPreview.loc[count, :].values.flatten().tolist()
-            self.previewTable.insert(
-                parent="",
-                index=ttkb.END,
-                values=value,
+        self.previewTable.tag_configure(tagname="error", background="lightcoral")
+        for count in range(self.dataPreviewDetails["Data Count"]):
+            data = self.dataPreview.loc[count, :]
+            value = data.values.flatten().tolist()
+            if data.isnull().any() or data.isin(["-", None]).any():
+                self.previewTable.insert(
+                    parent="", index=ttkb.END, values=value, tags=("error",)
+                )
+            else:
+                self.previewTable.insert(
+                    parent="",
+                    index=ttkb.END,
+                    values=value,
+                )
+
+    def show_data_preview_details(self) -> None:
+        self.dataInfoDetails = ttkb.Treeview(
+            self.dataInfoLabelFrame,
+            columns=list(self.dataPreviewDetails.keys()),
+            show="headings",
+            style="primary.Treeview",
+            height=1,
+        )
+        for heading in list(self.dataPreviewDetails.keys()):
+            self.dataInfoDetails.heading(column=heading, text=heading)
+        self.dataInfoDetails.column("#0", minwidth=1, width=100, stretch=True)
+        for col in list(self.dataPreviewDetails.keys()):
+            self.dataInfoDetails.column(
+                column=col, minwidth=1, width=100, stretch=True, anchor="center"
             )
+        self.dataInfoDetails.grid(row=0, column=0, sticky="nwe", padx=10, pady=10)
+        self.dataInfoDetails.insert(
+            "", ttkb.END, values=list(self.dataPreviewDetails.values())
+        )
 
     def create_xsmall_layout(self):
         self.frame.pack_forget()
@@ -117,9 +154,10 @@ class App(ttkb.Window):
             self.dataInfoFrame, text="Data Information"
         )
         self.dataInfoLabelFrame.pack(padx=10, pady=(0, 10), fill="both", expand=True)
-        ttkb.Label(master=self.dataInfoLabelFrame, text="File details goes here").pack(
-            padx=10, pady=10
-        )
+        # self.dataInfoDetails.pack(padx=10, pady=10, fill="x", expand=False)
+        # ttkb.Label(master=self.dataInfoLabelFrame, text="File details goes here").pack(
+        #     padx=10, pady=10
+        # )
 
         self.dataFrame = ttkb.LabelFrame(master=self.frame, text="Data Preview")
         self.dataFrame.pack(
