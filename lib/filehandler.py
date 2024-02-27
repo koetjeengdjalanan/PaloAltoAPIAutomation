@@ -1,5 +1,6 @@
 import pathlib
 import tkinter as tk
+import chardet
 import pandas as pd
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -125,8 +126,18 @@ class FileHandler:
 
         if not handlefile.empty or self.sourcefile != "":
             return self.sourcefile
-        else:
-            return ""
+        return ""
+
+    def encoder_detect(self) -> dict:
+        with open(self.sourcefile, "rb") as file:
+            data = file.read()
+            res = chardet.detect(data)
+            file.close()
+            if res in self.encodingList:
+                return res
+            else:
+                return None
+        pass
 
     def handling_file(self) -> pd.DataFrame:
         match pathlib.Path(self.sourcefile).suffix:
@@ -135,8 +146,15 @@ class FileHandler:
                     title="Confirm Source File?",
                     message="Make sure you choose CSV file separated by ',' or ';'!",
                 ):
-                    self.sourcedata = pd.read_csv(self.sourcefile)
-                    return self.sourcedata
+                    encoding = self.encoder_detect()
+                    if encoding:
+                        self.sourcedata = pd.read_csv(
+                            filepath_or_buffer=self.sourcefile,
+                            encoding=encoding["encoding"],
+                        )
+                        return self.sourcedata
+                    else:
+                        pass
                 else:
                     return {}
             case ".xlsx" | ".xls" | ".xlsm" | ".xlsb":
@@ -153,9 +171,8 @@ class FileHandler:
                     return self.sourcedata
                 else:
                     return {}
-            case _:
-                showerror(
-                    title="Your File is not Recognized",
-                    message="Please Choose available extension",
-                )
-                return {}
+        showerror(
+            title="Your File is not Recognized",
+            message="Please Choose available extension",
+        )
+        return {}

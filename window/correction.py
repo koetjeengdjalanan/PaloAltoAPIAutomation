@@ -11,10 +11,13 @@ class DataCorrection(ttkb.Toplevel):
         parent,
         title: str = "Data Correction Windows",
         start_size: tuple = (500, 300),
+        required: dict = {},
+        provided: list[str] = [],
     ):
         super().__init__(parent)
         self.geometry(f"{start_size[0]}x{start_size[1]}")
         self.title(title)
         ttkb.Button(self, command=self.destroy, text="close").pack(expand=True)
+        print(required, provided, sep="\n")
 
     pass
