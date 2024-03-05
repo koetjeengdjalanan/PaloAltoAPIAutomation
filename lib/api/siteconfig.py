@@ -1,5 +1,4 @@
 import http.client
-from icecream import ic
 
 
 class Update:
@@ -53,11 +52,7 @@ class Update:
             "security_policyset_id": {"req": False, "type": str, "value": None},
             "security_policysetstack_id": {"req": False, "type": str, "value": None},
             "service_binding": {"req": False, "type": str, "value": None},
-            "tags": {
-                "req": False,
-                "type": list[str],
-                "value": {"type": str, "req": False, "value": None},
-            },
+            "tags": {"req": False, "type": str, "value": None},
             "vrf_context_profile_id": {"req": False, "type": str, "value": None},
         }
 
@@ -79,5 +74,5 @@ class Update:
         return data.decode(encoding="utf-8")
 
 
-up = Update(siteId="localhost")
+# up = Update(siteId="localhost")
 # ic(up.body)

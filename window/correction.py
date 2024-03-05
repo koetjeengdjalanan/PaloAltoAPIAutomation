@@ -1,7 +1,14 @@
+import os
 import pprint
+import sys
 import icecream as ic
 import ttkbootstrap as ttkb
 from ttkbootstrap.scrolled import ScrolledFrame
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(parent_dir)
+from lib.api.SiteConfiguration.api_client import ApiClient
+from lib.api.siteconfig import Update as SCAPIUpdate
 
 
 class DataCorrection(ttkb.Toplevel):
@@ -28,7 +35,7 @@ class DataCorrection(ttkb.Toplevel):
         ### Main Content ###
         self.content(provided=provided, required=required)
 
-    def content(self, provided, required):
+    def content(self, provided: list, required: dict):
         contentCount: int = 0
         for key, value in required.items():
             l1Frame = ttkb.LabelFrame(master=self.rootFrame, text=key)
@@ -68,8 +75,14 @@ class DataCorrection(ttkb.Toplevel):
         )
 
     def __internalContent(
-        self, master, textVariable, label: str, req: bool = False, rowNumber: int = 0
+        self,
+        master,
+        textVariable: list,
+        label: str,
+        req: bool = False,
+        rowNumber: int = 0,
     ):
+        print(textVariable)
         ttkb.Label(
             master=master, text=label, bootstyle="danger" if req else "default"
         ).grid(padx=5, pady=5, column=0, row=rowNumber, sticky="w")
@@ -79,19 +92,21 @@ class DataCorrection(ttkb.Toplevel):
 
 
 def open_window():
-    try:
-        DC = DataCorrection(
-            parent=debug,
-            start_size=(768, 300),
-            required=[],
-            provided=[],
-        )
-        DC.grab_set()
-    except Exception as error:
-        ic(error)
+    # try:
+    DC = DataCorrection(
+        parent=debug,
+        start_size=(768, 350),
+        required=SCAPIUpdate().body,
+        provided=["some", "other", "thing", "to", "consider"],
+    )
+    DC.grab_set()
+    # except Exception as error:
+    #     print("Error", error, sep=" : ")
 
 
 if __name__ == "__main__":
+    # print(SCAPIUpdate().body)
+
     debug = ttkb.Window()
     ttkb.Button(debug, command=open_window, text="open").pack(expand=True)
     debug.geometry("200x200")

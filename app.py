@@ -3,8 +3,6 @@ import time
 import datetime
 import ttkbootstrap as ttkb
 import tkinter as tk
-import icecream as ic
-import asyncio
 from lib.api.siteconfig import Update as SCAPIUpdate
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.scrolled import ScrolledText
@@ -200,6 +198,7 @@ class App(ttkb.Window):
         self.frame = ttkb.Frame(self, bootstyle="default", name="rootFrame")
         self.frame.pack(expand=True, fill="both")
 
+        ### Source File ###
         self.filePickerFrame = ttkb.LabelFrame(self.frame, text="Source File")
         self.filePickerFrame.pack(fill="x", anchor="n", padx=10, pady=10)
         self.filePickerEntry = ttkb.Entry(
