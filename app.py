@@ -19,6 +19,7 @@ class App(ttkb.Window):
         super().__init__(themename=theme, iconphoto="assets/favicon.ico")
         self.title("Palo Alto Bulk Automation")
         self.geometry(f"{start_size[0]}x{start_size[1]}")
+        self.resizable(False, False)
 
         self.frame = ttkb.Frame(self, bootstyle="default")
         self.frame.pack(expand=True, fill="both")

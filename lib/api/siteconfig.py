@@ -12,12 +12,16 @@ class Update:
         self.siteId = siteId
         self.body = body or {
             "address": {
-                "city": {"req": False, "type": str, "value": None},
-                "country": {"req": False, "type": str, "value": None},
-                "post_code": {"req": False, "type": str, "value": None},
-                "state": {"req": False, "type": str, "value": None},
-                "street": {"req": False, "type": str, "value": None},
-                "street2": {"req": False, "type": str, "value": None},
+                "req": False,
+                "type": dict[str, any],
+                "value": {
+                    "city": {"req": False, "type": str, "value": None},
+                    "country": {"req": False, "type": str, "value": None},
+                    "post_code": {"req": False, "type": str, "value": None},
+                    "state": {"req": False, "type": str, "value": None},
+                    "street": {"req": False, "type": str, "value": None},
+                    "street2": {"req": False, "type": str, "value": None},
+                },
             },
             "admin_state": {"req": True, "type": str, "value": None},
             "element_cluster_role": {"req": True, "type": str, "value": None},
@@ -25,18 +29,15 @@ class Update:
                 "req": False,
                 "type": list,
                 "value": {
-                    "type": dict[str, str],
-                    "value": {
-                        "key": {"type": str, "value": None},
-                        "value": {"type": str, "value": None},
-                        "value_type": {"type": str, "value": None},
-                    },
+                    "key": {"type": str, "req": False, "value": None},
+                    "value": {"type": str, "req": False, "value": None},
+                    "value_type": {"type": str, "req": False, "value": None},
                 },
             },
             "id": {"req": True, "type": str, "value": None},
             "location": {
                 "req": False,
-                "type": dict[str, float],
+                "type": dict[str, any],
                 "value": {
                     "latitude": {"req": False, "type": float, "value": None},
                     "longitude": {"req": False, "type": float, "value": None},
@@ -55,7 +56,7 @@ class Update:
             "tags": {
                 "req": False,
                 "type": list[str],
-                "value": [{"type": str, "value": None}],
+                "value": {"type": str, "req": False, "value": None},
             },
             "vrf_context_profile_id": {"req": False, "type": str, "value": None},
         }
