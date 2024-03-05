@@ -27,36 +27,37 @@ class Setting(ttkb.Toplevel):
             master=self.rootFrame, text="User Credentials"
         )
         userSettingFrame.grid(padx=5, pady=5, ipadx=5, ipady=5, sticky="new")
+        self.userCred = user_credentials
 
-        username = ttkb.StringVar(value=user_credentials["username"])
-        secret = ttkb.StringVar(value=user_credentials["secret"])
-        tsgId = ttkb.StringVar(value=user_credentials["tsgId"])
+        username = ttkb.StringVar()
+        secret = ttkb.StringVar()
+        tsgId = ttkb.StringVar()
 
         ttkb.Label(master=userSettingFrame, text="User Name").grid(
             padx=5, pady=5, column=0, row=0, sticky="w"
         )
-        nameField = ttkb.Entry(
+        self.nameField = ttkb.Entry(
             master=userSettingFrame, justify="left", textvariable=username, width=50
         )
-        nameField.grid(padx=5, pady=5, row=0, column=1, sticky="e", columnspan=2)
+        self.nameField.grid(padx=5, pady=5, row=0, column=1, sticky="e", columnspan=2)
         ttkb.Label(master=userSettingFrame, text="Secret").grid(
             padx=5, pady=5, column=0, row=1, sticky="w"
         )
-        secretField = ttkb.Entry(
+        self.secretField = ttkb.Entry(
             master=userSettingFrame,
             justify="left",
             textvariable=secret,
             show="*",
             width=50,
         )
-        secretField.grid(padx=5, pady=5, row=1, column=1, sticky="e", columnspan=2)
+        self.secretField.grid(padx=5, pady=5, row=1, column=1, sticky="e", columnspan=2)
         ttkb.Label(master=userSettingFrame, text="TSG ID").grid(
             padx=5, pady=5, column=0, row=2, sticky="w"
         )
-        tsgIdField = ttkb.Entry(
+        self.tsgIdField = ttkb.Entry(
             master=userSettingFrame, justify="left", textvariable=tsgId, width=50
         )
-        tsgIdField.grid(padx=5, pady=5, row=2, column=1, sticky="e", columnspan=2)
+        self.tsgIdField.grid(padx=5, pady=5, row=2, column=1, sticky="e", columnspan=2)
         ttkb.Button(
             master=userSettingFrame,
             command=lambda: print("Cancel"),
@@ -65,21 +66,53 @@ class Setting(ttkb.Toplevel):
         ).grid(padx=5, pady=5, row=3, column=0, sticky="se")
         ttkb.Button(
             master=userSettingFrame,
-            command=lambda: print("Save"),
+            command=lambda: self.on_save(),
             bootstyle="success",
             text="Save",
         ).grid(padx=5, pady=5, row=3, column=1, sticky="se")
         ttkb.Button(
             master=userSettingFrame,
-            command=lambda: print("Test Connection"),
+            command=lambda: self.test_connection(),
             bootstyle="info",
             text="Test Connection",
         ).grid(padx=5, pady=5, row=3, column=2, sticky="se")
 
+        self.after(ms=10, func=self.__populate_entry)
+
+    def __populate_entry(self):
+        for key, value in self.userCred.items():
+            if key == "username" and value is not None or "":
+                self.nameField.delete(first=0, last=ttkb.END)
+                self.nameField.insert(index=0, string=value)
+            elif key == "secret" and value is not None or "":
+                self.secretField.delete(first=0, last=ttkb.END)
+                self.secretField.insert(index=0, string=value)
+            elif key == "tsgId" and value is not None or "":
+                self.tsgIdField.delete(first=0, last=ttkb.END)
+                self.tsgIdField.insert(index=0, string=value)
+
+    def on_save(self):
+        self.userCred = {
+            "username": self.nameField.get(),
+            "secret": self.secretField.get(),
+            "tsgId": self.tsgIdField.get(),
+        }
+        print(self.userCred)
+
+    def test_connection(self):
+        pass
+
 
 def open_window(parent):
     print("Open Shazame")
-    SW = Setting(parent=parent)
+    SW = Setting(
+        parent=parent,
+        user_credentials={
+            "username": "NTT-API-Acc@1217317412.iam.panserviceaccount.com",
+            "secret": "6ad0c141-5405-438a-b3f2-e6fd47cfb611",
+            "tsgId": 1217317412,
+        },
+    )
     SW.grab_set()
 
 
