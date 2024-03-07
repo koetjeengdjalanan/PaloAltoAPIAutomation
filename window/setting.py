@@ -1,4 +1,6 @@
+import os
 import ttkbootstrap as ttkb
+from dotenv import load_dotenv
 
 
 class Setting(ttkb.Toplevel):
@@ -13,21 +15,40 @@ class Setting(ttkb.Toplevel):
         parent,
         title: str = "Settings",
         start_size: tuple = (500, 300),
-        user_credentials: dict = {
-            "username": None,
-            "secret": None,
-            "tsgId": None,
-        },
+        user_name: str = None,
+        secret_string: str = None,
+        tsg_id: int = None,
+        env_path: str = None,
     ):
         super().__init__(parent)
         self.title(title)
         self.rootFrame = ttkb.Frame(master=self)
         self.rootFrame.pack(ipadx=5, ipady=5, fill="both", expand=True)
+
+        ### ENV File Picker ###
+        # envFilePicker = ttkb.LabelFrame(master=self.rootFrame, text="Environment File")
+        # envFilePicker.grid(
+        #     row=0, column=0, padx=5, pady=5, ipadx=5, ipady=5, sticky="new"
+        # )
+        # self.envFileEntry = ttkb.Entry(master=envFilePicker, justify="left", width=40)
+        # self.envFileEntry.grid(padx=5, pady=5, row=0, column=0)
+        # ttkb.Button(master=envFilePicker, image=PhotoImage(data=Icon.question)).grid(
+        #     padx=5, pady=5, row=0, column=1
+        # )
+        # ttkb.Button(master=envFilePicker, image=PhotoImage(data=Icon.warning)).grid(
+        #     padx=5, pady=5, row=0, column=2
+        # )
+
+        ### User Credentials ###
         userSettingFrame = ttkb.LabelFrame(
             master=self.rootFrame, text="User Credentials"
         )
-        userSettingFrame.grid(padx=5, pady=5, ipadx=5, ipady=5, sticky="new")
-        self.userCred = user_credentials
+        userSettingFrame.grid(
+            row=1, column=0, padx=5, pady=5, ipadx=5, ipady=5, sticky="sew"
+        )
+        self.userName = user_name
+        self.secret = secret_string
+        self.tsgId = tsg_id
 
         username = ttkb.StringVar()
         secret = ttkb.StringVar()
@@ -60,7 +81,7 @@ class Setting(ttkb.Toplevel):
         self.tsgIdField.grid(padx=5, pady=5, row=2, column=1, sticky="e", columnspan=2)
         ttkb.Button(
             master=userSettingFrame,
-            command=lambda: print("Cancel"),
+            command=lambda: self.destroy(),
             bootstyle="danger",
             text="Cancel",
         ).grid(padx=5, pady=5, row=3, column=0, sticky="se")
@@ -80,24 +101,21 @@ class Setting(ttkb.Toplevel):
         self.after(ms=10, func=self.__populate_entry)
 
     def __populate_entry(self):
-        for key, value in self.userCred.items():
-            if key == "username" and value is not None or "":
-                self.nameField.delete(first=0, last=ttkb.END)
-                self.nameField.insert(index=0, string=value)
-            elif key == "secret" and value is not None or "":
-                self.secretField.delete(first=0, last=ttkb.END)
-                self.secretField.insert(index=0, string=value)
-            elif key == "tsgId" and value is not None or "":
-                self.tsgIdField.delete(first=0, last=ttkb.END)
-                self.tsgIdField.insert(index=0, string=value)
+        if self.userName is not None or "":
+            self.nameField.delete(first=0, last=ttkb.END)
+            self.nameField.insert(index=0, string=self.userName)
+        if self.secret is not None or "":
+            self.secretField.delete(first=0, last=ttkb.END)
+            self.secretField.insert(index=0, string=self.secret)
+        if self.tsgId is not None or "":
+            self.tsgIdField.delete(first=0, last=ttkb.END)
+            self.tsgIdField.insert(index=0, string=self.tsgId)
 
     def on_save(self):
-        self.userCred = {
-            "username": self.nameField.get(),
-            "secret": self.secretField.get(),
-            "tsgId": self.tsgIdField.get(),
-        }
-        print(self.userCred)
+        self.userName = self.nameField.get()
+        self.secret = self.secretField.get()
+        self.tsgId = self.tsgIdField.get()
+        print(self.userName, self.secret, self.tsgId, sep="\n")
 
     def test_connection(self):
         pass
@@ -105,13 +123,12 @@ class Setting(ttkb.Toplevel):
 
 def open_window(parent):
     print("Open Shazame")
+    load_dotenv(dotenv_path="./.env")
     SW = Setting(
         parent=parent,
-        user_credentials={
-            "username": "NTT-API-Acc@1217317412.iam.panserviceaccount.com",
-            "secret": "6ad0c141-5405-438a-b3f2-e6fd47cfb611",
-            "tsgId": 1217317412,
-        },
+        user_name=os.getenv("USER_NAME"),
+        secret_string=os.getenv("SECRET_STRING"),
+        tsg_id=os.getenv("TSG_ID"),
     )
     SW.grab_set()
 

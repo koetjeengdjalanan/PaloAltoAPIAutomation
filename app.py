@@ -3,25 +3,29 @@ import time
 import datetime
 import ttkbootstrap as ttkb
 import tkinter as tk
+import os
 from lib.api.siteconfig import Update as SCAPIUpdate
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.scrolled import ScrolledText
 from ttkbootstrap.constants import *  # noqa: F403
 from tkinter.messagebox import showerror
+from dotenv import load_dotenv
 from lib.filehandler import FileHandler
 from window.correction import DataCorrection
+from window.setting import Setting
 
 
 class App(ttkb.Window):
     def __init__(self, start_size: tuple, theme: str) -> None:
         super().__init__(themename=theme, iconphoto="assets/favicon.ico")
-        self.title("Palo Alto Bulk Automation")
+        self.title("Palo Alto Network Bulk Automation")
         self.geometry(f"{start_size[0]}x{start_size[1]}")
         self.resizable(False, False)
 
         self.frame = ttkb.Frame(self, bootstyle="default")
         self.frame.pack(expand=True, fill="both")
         self.dataPreviewDetails = {"Data Count": "", "nullValue": ""}
+        load_dotenv(dotenv_path="./.env")
 
         SizeNotifier(
             self,
@@ -175,6 +179,15 @@ class App(ttkb.Window):
     def get_now(self) -> str:
         return datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
+    def open_setting(self) -> None:
+        settingWindow = Setting(
+            parent=self,
+            user_name=os.getenv("USER_NAME"),
+            secret_string=os.getenv("SECRET_STRING"),
+            tsg_id=os.getenv("TSG_ID"),
+        )
+        settingWindow.grab_set()
+
     def create_xsmall_layout(self):
         self.frame.pack_forget()
         self.frame = ttkb.Frame(self, bootstyle="default")
@@ -209,6 +222,11 @@ class App(ttkb.Window):
             master=self.filePickerFrame,
             text="Choose File",
             command=lambda: threading.Thread(target=self.pick_source_file).start(),
+        ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
+        ttkb.Button(
+            master=self.filePickerFrame,
+            text="Setting",
+            command=lambda: self.open_setting(),
         ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
 
         contentFrame = tk.Frame(master=self.frame, background="red")
