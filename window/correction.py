@@ -4,11 +4,12 @@ import sys
 import icecream as ic
 import ttkbootstrap as ttkb
 from ttkbootstrap.scrolled import ScrolledFrame
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(parent_dir)
-from lib.api.SiteConfiguration.api_client import ApiClient
 from lib.api.siteconfig import Update as SCAPIUpdate
+
+# parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# sys.path.append(parent_dir)
+# from lib.api.SiteConfiguration.api_client import ApiClient
+# from lib.api.siteconfig import Update as SCAPIUpdate
 
 
 class DataCorrection(ttkb.Toplevel):

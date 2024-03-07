@@ -11,8 +11,7 @@ from ttkbootstrap.constants import *  # noqa: F403
 from tkinter.messagebox import showerror
 from dotenv import load_dotenv
 from lib.filehandler import FileHandler
-from window.correction import DataCorrection
-from window.setting import Setting
+from window import DataCorrection, Setting
 
 
 class App(ttkb.Window):
@@ -220,13 +219,16 @@ class App(ttkb.Window):
         self.filePickerEntry.pack(pady=10, padx=10, side="left", fill="x", expand=True)
         ttkb.Button(
             master=self.filePickerFrame,
-            text="Choose File",
-            command=lambda: threading.Thread(target=self.pick_source_file).start(),
-        ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
-        ttkb.Button(
-            master=self.filePickerFrame,
             text="Setting",
             command=lambda: self.open_setting(),
+        ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
+        ttkb.Separator(master=self.filePickerEntry, orient="vertical").pack(
+            side="right"
+        )
+        ttkb.Button(
+            master=self.filePickerFrame,
+            text="Choose File",
+            command=lambda: threading.Thread(target=self.pick_source_file).start(),
         ).pack(padx=10, pady=10, side="right", fill="none", expand=False)
 
         contentFrame = tk.Frame(master=self.frame, background="red")

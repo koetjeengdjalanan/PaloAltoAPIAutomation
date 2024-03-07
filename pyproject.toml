@@ -1,0 +1,9 @@
+[project]
+name = "PaloAltoNetworkBulkAutomation"
+version = "0.1.0"
+description = "Firstly requested for BSI Usage"
+authors = [
+    { name = "Martin Sambulare", email = "martin.sambulare@nttindonesia.com" },
+]
+requires-python = ">=3.11.6"
+classifiers = ["Developers Status :: 3 - Alpha", "Natural Language :: English"]
