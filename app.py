@@ -183,7 +183,7 @@ class App(ttkb.Window):
             parent=self,
             user_name=os.getenv("USER_NAME"),
             secret_string=os.getenv("SECRET_STRING"),
-            tsg_id=os.getenv("TSG_ID"),
+            tsg_id=int(os.getenv("TSG_ID")),
         )
         settingWindow.grab_set()
 

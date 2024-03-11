@@ -1,6 +1,10 @@
+from mailbox import Message
 import os
 import ttkbootstrap as ttkb
+from pprint import pprint
 from dotenv import load_dotenv
+from ttkbootstrap.dialogs import dialogs
+from lib import FileHandler, Login, Download
 
 
 class Setting(ttkb.Toplevel):
@@ -24,6 +28,7 @@ class Setting(ttkb.Toplevel):
         self.title(title)
         self.rootFrame = ttkb.Frame(master=self)
         self.rootFrame.pack(ipadx=5, ipady=5, fill="both", expand=True)
+        self.authRes = None
 
         ### ENV File Picker ###
         # envFilePicker = ttkb.LabelFrame(master=self.rootFrame, text="Environment File")
@@ -79,24 +84,28 @@ class Setting(ttkb.Toplevel):
             master=userSettingFrame, justify="left", textvariable=tsgId, width=50
         )
         self.tsgIdField.grid(padx=5, pady=5, row=2, column=1, sticky="e", columnspan=2)
+        self.workingInfoLabel = ttkb.Label(master=userSettingFrame, justify="center")
+        self.workingInfoLabel.grid(
+            padx=2, pady=2, row=3, column=0, sticky="nsew", columnspan=3
+        )
         ttkb.Button(
             master=userSettingFrame,
             command=lambda: self.destroy(),
             bootstyle="danger",
             text="Cancel",
-        ).grid(padx=5, pady=5, row=3, column=0, sticky="se")
+        ).grid(padx=5, pady=5, row=4, column=0, sticky="se")
         ttkb.Button(
             master=userSettingFrame,
             command=lambda: self.on_save(),
             bootstyle="success",
             text="Save",
-        ).grid(padx=5, pady=5, row=3, column=1, sticky="se")
+        ).grid(padx=5, pady=5, row=4, column=1, sticky="se")
         ttkb.Button(
             master=userSettingFrame,
-            command=lambda: self.test_connection(),
+            command=lambda: self.downloadList(),
             bootstyle="info",
-            text="Test Connection",
-        ).grid(padx=5, pady=5, row=3, column=2, sticky="se")
+            text="Download List",
+        ).grid(padx=5, pady=5, row=4, column=2, sticky="se")
 
         self.after(ms=10, func=self.__populate_entry)
 
@@ -112,13 +121,38 @@ class Setting(ttkb.Toplevel):
             self.tsgIdField.insert(index=0, string=self.tsgId)
 
     def on_save(self):
+        self.workingInfoLabel.config(
+            text="Logging In...", bootstyle="info", justify="center"
+        )
         self.userName = self.nameField.get()
         self.secret = self.secretField.get()
         self.tsgId = self.tsgIdField.get()
-        print(self.userName, self.secret, self.tsgId, sep="\n")
+        # print(self.userName, self.secret, self.tsgId, sep="\n")
+        try:
+            auth = Login(username=self.userName, secret=self.secret, tsg_id=self.tsgId)
+            self.workingInfoLabel.config(
+                text="Log in Success", bootstyle="success", justify="center"
+            )
+        except Exception as error:
+            dialogs.Messagebox.show_error(
+                Message=error, title="An Error Occurred", parent=self, alert=True
+            )
+            pass
+        self.authRes = auth.request()
+        print(self.authRes)
 
-    def test_connection(self):
-        pass
+    def downloadList(self):
+        bearerToken = self.authRes["data"]["access_token"]
+        download = Download(bearer_token=bearerToken)
+        try:
+            res = download.request()
+            FH = FileHandler()
+            FH.save_as_excel(data=res["items"])
+        except Exception as error:
+            dialogs.Messagebox.show_error(
+                message=f"{error}", title="An Error Occurred", parent=self, alert=True
+            )
+            pass
 
 
 def open_window(parent):

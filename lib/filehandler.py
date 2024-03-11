@@ -176,3 +176,15 @@ class FileHandler:
             message="Please Choose available extension",
         )
         return {}
+
+    def save_as_excel(self, data: str):
+        fileLoc = fd.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=(
+                ("Excel Files", "*.xls *.xlsx *.xlsm *.xlsb"),
+                ("All Files", "*.*"),
+            ),
+            initialdir="~",
+            title="Export as Excel File",
+        )
+        pd.read_json(data).to_excel(fileLoc)
