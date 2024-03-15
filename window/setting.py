@@ -5,6 +5,7 @@ from pprint import pprint
 from dotenv import load_dotenv
 from ttkbootstrap.dialogs import dialogs
 from lib import FileHandler, Login, Download
+from lib.api.auth import Profile
 
 
 class Setting(ttkb.Toplevel):
@@ -137,22 +138,32 @@ class Setting(ttkb.Toplevel):
             dialogs.Messagebox.show_error(
                 Message=error, title="An Error Occurred", parent=self, alert=True
             )
-            pass
         self.authRes = auth.request()
         print(self.authRes)
+        try:
+            profile = Profile(bearer_token=self.authRes["data"]["access_token"])
+            self.workingInfoLabel.config(
+                text="Get Profile Success", bootstyle="success", justify="center"
+            )
+        except Exception as error:
+            dialogs.Messagebox.show_error(
+                Message=error, title="An Error Occurred", parent=self, alert=True
+            )
+        self.profile = profile.request()
+        print(self.profile)
 
     def downloadList(self):
         bearerToken = self.authRes["data"]["access_token"]
         download = Download(bearer_token=bearerToken)
         try:
             res = download.request()
+            print(res)
             FH = FileHandler()
-            FH.save_as_excel(data=res["items"])
+            FH.save_as_excel(data=res["data"]["items"])
         except Exception as error:
             dialogs.Messagebox.show_error(
                 message=f"{error}", title="An Error Occurred", parent=self, alert=True
             )
-            pass
 
 
 def open_window(parent):

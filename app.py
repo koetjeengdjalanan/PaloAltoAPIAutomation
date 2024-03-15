@@ -181,9 +181,9 @@ class App(ttkb.Window):
     def open_setting(self) -> None:
         settingWindow = Setting(
             parent=self,
-            user_name=os.getenv("USER_NAME"),
-            secret_string=os.getenv("SECRET_STRING"),
-            tsg_id=int(os.getenv("TSG_ID")),
+            user_name=os.getenv("USER_NAME") or "",
+            secret_string=os.getenv("SECRET_STRING") or "",
+            tsg_id=int(os.getenv("TSG_ID")) or "",
         )
         settingWindow.grab_set()
 

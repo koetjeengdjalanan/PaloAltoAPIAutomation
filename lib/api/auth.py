@@ -43,4 +43,31 @@ class Login:
             print(f"Something Went Wrong {requestException} {res}")
             raise
 
-    pass
+
+class Profile:
+    def __init__(
+        self,
+        url: str = "https://api.sase.paloaltonetworks.com/sdwan/v2.1/api/profile",
+        bearer_token: str = None,
+    ) -> None:
+        self.url = url
+        self.bearerToken = bearer_token
+
+    def request(self):
+        try:
+            res = requests.get(
+                url=self.url,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "NTTIndonesia-PANBA/0.1.0",
+                    "Authorization": f"Bearer {self.bearerToken}",
+                },
+            )
+            res.raise_for_status()
+            return {"status": res.status_code, "data": res.json()}
+        except requests.exceptions.HTTPError as httpError:
+            print(f"Http Error {httpError}")
+            raise
+        except requests.exceptions.RequestException as requestException:
+            print(f"Something Went Wrong {requestException} {res}")
+            raise

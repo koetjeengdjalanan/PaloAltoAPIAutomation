@@ -11,7 +11,7 @@ class Download:
     def request(self) -> dict:
         try:
             res = requests.get(
-                url=f"{self.baseUrl}/sdwan/v4.9/api/sites",
+                url=f"{self.baseUrl}/sdwan/v4.8/api/sites",
                 headers={
                     "Accept": "application/json",
                     "User-Agent": "NTTIndonesia-PANBA/0.1.0",
