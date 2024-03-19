@@ -1,3 +1,4 @@
+from datetime import datetime
 import pathlib
 import tkinter as tk
 import chardet
@@ -177,7 +178,8 @@ class FileHandler:
         )
         return {}
 
-    def save_as_excel(self, data: str):
+    def save_as_excel(self, data: list) -> None:
+        # print(type(data), data, sep="\n")
         fileLoc = fd.asksaveasfilename(
             defaultextension=".xlsx",
             filetypes=(
@@ -185,6 +187,27 @@ class FileHandler:
                 ("All Files", "*.*"),
             ),
             initialdir="~",
+            initialfile=f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_Tenant_List",
             title="Export as Excel File",
         )
-        pd.read_json(data).to_excel(fileLoc)
+        if fileLoc is not None or "":
+            # pd.read_json(data).to_excel(fileLoc)
+            pd.DataFrame(
+                data=[self.flatten_dict(data=row, level=1) for row in data]
+            ).to_excel(excel_writer=fileLoc, index=False, header=True)
+
+    def flatten_dict(
+        self, data: dict, parent_key: str = "", sep: str = "_", level: int = 1
+    ) -> dict:
+        items = []
+        for key, value in data.items():
+            new_key = f"{parent_key}{sep}{key}" if parent_key != "" else key
+            if isinstance(value, dict) and level > 0:
+                items.extend(
+                    self.flatten_dict(
+                        data=value, parent_key=new_key, level=level - 1
+                    ).items()
+                )
+            else:
+                items.append((new_key, value))
+        return dict(items)

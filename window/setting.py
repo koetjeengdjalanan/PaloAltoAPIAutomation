@@ -139,7 +139,7 @@ class Setting(ttkb.Toplevel):
                 Message=error, title="An Error Occurred", parent=self, alert=True
             )
         self.authRes = auth.request()
-        print(self.authRes)
+        # print(self.authRes)
         try:
             profile = Profile(bearer_token=self.authRes["data"]["access_token"])
             self.workingInfoLabel.config(
@@ -150,20 +150,24 @@ class Setting(ttkb.Toplevel):
                 Message=error, title="An Error Occurred", parent=self, alert=True
             )
         self.profile = profile.request()
-        print(self.profile)
+        # print(self.profile)
 
     def downloadList(self):
         bearerToken = self.authRes["data"]["access_token"]
         download = Download(bearer_token=bearerToken)
-        try:
-            res = download.request()
-            print(res)
-            FH = FileHandler()
-            FH.save_as_excel(data=res["data"]["items"])
-        except Exception as error:
-            dialogs.Messagebox.show_error(
-                message=f"{error}", title="An Error Occurred", parent=self, alert=True
-            )
+        res = download.request()
+        # print(res)
+        FH = FileHandler()
+        FH.save_as_excel(data=res["data"]["items"])
+        # try:
+        #     res = download.request()
+        #     print(res)
+        #     FH = FileHandler()
+        #     FH.save_as_excel(data=res["data"]["items"])
+        # except Exception as error:
+        #     dialogs.Messagebox.show_error(
+        #         message=f"{error}", title="An Error Occurred", parent=self, alert=True
+        #     )
 
 
 def open_window(parent):
